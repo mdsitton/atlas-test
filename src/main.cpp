@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include "application.hpp"
+#include "util.hpp"
 #include <GL/glew.h>
 
 void init_sdl()
@@ -41,11 +42,9 @@ void run()
 int main(int argc, char const *argv[])
 {
     // This is mainly is a global exception handler to show friendly messages to users.
-
-    try
-    {
+    std::string shaderPath = expand_path("/data/shaders");
+    try {
         run();
-
     } catch (std::runtime_error &err) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Runtime Error", err.what(), nullptr);
         return 1;

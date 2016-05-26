@@ -18,5 +18,7 @@ find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
 
-add_executable(main src/main.cpp src/application.cpp)
+include_directories("${PROJECT_SOURCE_DIR}/extern/stb")
+
+add_executable(main src/main.cpp src/application.cpp src/util.cpp)
 target_link_libraries(main ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
