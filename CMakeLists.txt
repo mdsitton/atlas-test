@@ -11,14 +11,22 @@ if(${WIN32})
 endif()
 
 find_package(GLEW REQUIRED)
-include_directories($(GLEW_INCLUDE_DIRS))
+include_directories(${GLEW_INCLUDE_DIRS})
 
 find_package(OpenGL REQUIRED)
 
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIR})
 
+find_package(GLM REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+
 include_directories("${PROJECT_SOURCE_DIR}/extern/stb")
 
-add_executable(main src/main.cpp src/application.cpp src/util.cpp)
+add_executable(main
+src/main.cpp
+src/application.cpp
+src/util.cpp
+src/renderer.cpp)
+
 target_link_libraries(main ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
