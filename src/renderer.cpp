@@ -73,7 +73,6 @@ Renderer::Renderer(int width, int height)
 {
     m_projection = glm::ortho(0.0f, static_cast<float>(m_width), static_cast<float>(m_height), 0.0f, -1.0f, 1.0f);
     glViewport(0, 0, m_width, m_height);
-    std::cout << "Test" << std::endl;
     GLuint arr[1];
     glGenVertexArrays(1, arr);
     m_vao = arr[0];
