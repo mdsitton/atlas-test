@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include "application.hpp"
 
+#include "GL/gl3w.h"
+
 Application::Application(int width, int height, std::string title)
 : m_width(width), m_height(height), m_title(title)
 {

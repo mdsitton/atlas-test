@@ -1,4 +1,3 @@
-#include "util.hpp"
 
 #include <fstream>
 
@@ -12,6 +11,9 @@
 #include <unistd.h>
 #include <linux/limits.h>
 #endif
+
+#include "util.hpp"
+#include "config.hpp"
 
 
 void replace_substr(std::string &tagetStr, const std::string find, const std::string replace)
@@ -135,6 +137,5 @@ std::string expand_path(const std::string virPath)
     replace_substr(virPathCopy, "/", PATH_SEP);
 
     path.append(virPath);
-    std::cout << path << std::endl;
     return path;
 }

@@ -3,8 +3,10 @@
 #include <stdexcept>
 #include <string>
 #include "application.hpp"
+#include "renderer.hpp"
 #include "util.hpp"
-#include <GL/glew.h>
+
+#include "GL/gl3w.h"
 
 void init_sdl()
 {
@@ -14,12 +16,14 @@ void init_sdl()
     }
 }
 
-void init_glew()
+void init_gl3w()
 {
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
+    if (gl3wInit())
     {
-        throw std::runtime_error(reinterpret_cast<const char *>(glewGetErrorString(err)));
+        throw std::runtime_error("Failed to initialize opengl.");
+    }
+    if (!gl3wIsSupported(3, 3)) {
+        throw std::runtime_error("OpenGL 3.3 not supported.");
     }
 }
 
@@ -27,8 +31,10 @@ void run()
 {
     init_sdl();
     Application atlasTest {800, 600, "Atlas Tests"};
+    init_gl3w();
+    Renderer renderer(800, 600);
 
-    init_glew();
+
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
     while (atlasTest.process_events())
@@ -42,10 +48,10 @@ void run()
 int main(int argc, char const *argv[])
 {
     // This is mainly is a global exception handler to show friendly messages to users.
-    std::string shaderPath = expand_path("/data/shaders");
     try {
         run();
     } catch (std::runtime_error &err) {
+        std::cout << "Runtime Error:\n" << err.what() << std::endl;
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Runtime Error", err.what(), nullptr);
         return 1;
     }

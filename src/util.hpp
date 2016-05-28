@@ -1,8 +1,5 @@
 #pragma once
 #include <string>
-#include <iostream>
-
-#include "config.hpp"
 
 enum class FileMode
 {

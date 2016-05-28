@@ -3,7 +3,7 @@
 #if defined(_WIN32)
     #define PLATFORM_WINDOWS
     #define PATH_SEP "\\"
-#elif defined(__LINUX__)
+#elif defined(__linux__)
     #define PLATFORM_LINUX
     #define PATH_SEP "/"
 #elif defined(__APPLE__)
