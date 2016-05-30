@@ -30,6 +30,7 @@ src/main.cpp
 src/application.cpp
 src/util.cpp
 src/renderer.cpp
+src/texture.cpp
 src/GL/gl3w.c)
 
 set(BINARY_DATA_DIR ${CMAKE_BINARY_DIR}/data)
