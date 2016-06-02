@@ -1,6 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -81,8 +82,23 @@ Renderer::Renderer(int width, int height)
     m_fragmentShader = create_shader("/data/shaders/main.fs", GL_FRAGMENT_SHADER);
 
     m_program = setup_program(m_vertexShader, m_fragmentShader);
+}
 
+void Renderer::error_check()
+{
+    GLenum err = glGetError();
+    if(err != GL_NO_ERROR)
+    {
+        std::string errorStr = "The following opengl errors have occured:";
 
+        while(err != GL_NO_ERROR)
+        {
+            errorStr.append("\n");
+            errorStr.append(oglErrorMap.find(err)->second);
+            err = glGetError();
+        }
+        throw std::runtime_error(errorStr.c_str());
+    }
 }
 
 void Renderer::render()

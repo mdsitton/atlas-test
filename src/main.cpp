@@ -5,6 +5,7 @@
 #include "application.hpp"
 #include "renderer.hpp"
 #include "util.hpp"
+#include "texture.hpp"
 
 #include "GL/gl3w.h"
 
@@ -36,11 +37,13 @@ void run()
 
 
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    Texture testTex("null", renderer.get_shader_program());
 
     while (atlasTest.process_events())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         atlasTest.swap();
+        renderer.error_check();
     }
 }
 

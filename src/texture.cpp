@@ -20,21 +20,22 @@ static GLuint _currentBoundtexture = 0;
 Texture::Texture(std::string path, GLuint program)
 : m_path(path), m_program(program)
 {
-    _texCount++;
     m_texUnitID = _texCount;
-
-    load_image(m_path);
+    _texCount++;
+    if (m_path == "null"){
+        load_image();
+    } else {
+        load_image(m_path);
+    }
 
     m_texSampID = glGetUniformLocation(m_program, "textureSampler");
 
-    GLuint texid;
-    glGenTextures(1, &texid);
-    m_texID = texid;
+    glGenTextures(1, &m_texID);
     glBindTexture(GL_TEXTURE_2D, m_texID);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &(m_pixelData.get())[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pixelData.get());
 }
 
 void Texture::load_image(std::string filename)
@@ -78,6 +79,20 @@ void Texture::load_image(std::string filename)
         }
     }
     stbi_image_free( img_buf );
+}
+
+// Fake load image to test image loading without any file.
+void Texture::load_image()
+{
+    m_width = 8192;
+    //m_height = 16384;
+    m_height = 8192;
+
+    m_pixelData = std::make_unique<unsigned char[]>(m_width*m_height*4);
+
+    for (int i = 0;i < (m_width*m_height*4); i++) {
+        m_pixelData[i] = 255U;
+    }
 }
 
 void Texture::bind()

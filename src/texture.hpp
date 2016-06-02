@@ -21,9 +21,11 @@ private:
     int m_texUnitID;
     GLuint m_texID;
 
+    void load_image(std::string filename);
+    void load_image();
+
 public:
     Texture(std::string path, GLuint program);
-    void load_image(std::string filename);
     void bind();
     //~Texture();
 };
