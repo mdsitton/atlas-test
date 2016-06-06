@@ -1,19 +1,20 @@
 #pragma once
 #include <string>
-#include <unordered_map>
-
-#include "GL/gl3w.h"
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 GLuint create_shader(std::string shader, GLenum shaderType);
 GLuint setup_program(GLuint vertex, GLuint fragment);
+void check_shader(GLuint shader);
+void check_program(GLuint program);
 
-//struct Rect
-//{
-    //texture
-    //modelmat or pos/rot/scale x y rot scale
-//};
-
+/*
+struct Rect
+{
+    // texture
+    // modelmatrix or x, y, rot, scale
+};
+*/
 class ObjectManager
 {
 public:
@@ -23,18 +24,10 @@ public:
 class Renderer
 {
 public:
-    Renderer(int width, int height);
-    //~Renderer();
+    Renderer();
+    ~Renderer();
     void render();
-    GLuint get_shader_program() {return m_program;}
-    void error_check();
-
 private:
     GLuint m_vao;
     glm::mat4 m_projection;
-    int m_width;
-    int m_height;
-    GLuint m_vertexShader;
-    GLuint m_fragmentShader;
-    GLuint m_program;
 };

@@ -20,16 +20,8 @@ static const std::unordered_map<GLenum, std::string> oglErrorMap {
     {GL_CONTEXT_LOST, "GL_CONTEXT_LOST"}
 };
 
-GLuint create_shader(std::string shaderPath, GLenum shaderType)
+void check_shader(GLuint shader)
 {
-    GLuint shader = glCreateShader(shaderType);
-    std::string fullShaderPath = expand_path(shaderPath);
-    std::string shaderStr = read_file(fullShaderPath, FileMode::Normal);
-
-    const char *c_str = shaderStr.c_str();
-    glShaderSource(shader, 1, &c_str, nullptr);
-    glCompileShader(shader);
-
     GLint status;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
 
@@ -46,20 +38,23 @@ GLuint create_shader(std::string shaderPath, GLenum shaderType)
     } else {
         std::cout << "Shader compiled successfully." << std::endl;
     }
+}
+
+GLuint create_shader(std::string shaderPath, GLenum shaderType)
+{
+    GLuint shader = glCreateShader(shaderType);
+    std::string fullShaderPath = expand_path(shaderPath);
+    std::string shaderStr = read_file(fullShaderPath, FileMode::Normal);
+
+    const char *c_str = shaderStr.c_str();
+    glShaderSource(shader, 1, &c_str, nullptr);
+    glCompileShader(shader);
 
     return shader;
 }
 
-GLuint setup_program(GLuint vertex, GLuint fragment)
+void check_program(GLuint program)
 {
-
-    GLuint program = glCreateProgram();
-
-    glAttachShader(program, vertex);
-    glAttachShader(program, fragment);
-
-    glLinkProgram(program);
-
     GLint status;
     glGetProgramiv(program, GL_LINK_STATUS, &status);
 
@@ -76,8 +71,18 @@ GLuint setup_program(GLuint vertex, GLuint fragment)
     } else {
         std::cout << "Program Linked successfully." << std::endl;
     }
+}
 
-    glUseProgram(program);
+GLuint setup_program(GLuint vertex, GLuint fragment)
+{
+
+    GLuint program = glCreateProgram();
+
+    glAttachShader(program, vertex);
+    glAttachShader(program, fragment);
+
+    glLinkProgram(program);
+
     return program;
 }
 
@@ -90,10 +95,20 @@ Renderer::Renderer(int width, int height)
     glGenVertexArrays(1, arr);
     m_vao = arr[0];
     glBindVertexArray(m_vao);
+    
+    // we should check the shader compile status for shaders before we link the program
     m_vertexShader = create_shader("/data/shaders/main.vs", GL_VERTEX_SHADER);
     m_fragmentShader = create_shader("/data/shaders/main.fs", GL_FRAGMENT_SHADER);
 
+    check_shader(m_vertexShader);
+    check_shader(m_fragmentShader);
+
     m_program = setup_program(m_vertexShader, m_fragmentShader);
+
+    check_program(m_program);
+
+
+    glUseProgram(m_program);
 }
 
 void Renderer::error_check()
