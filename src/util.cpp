@@ -1,7 +1,8 @@
 
 #include <fstream>
+#include "config.hpp"
 
-#ifdef PLATFORM_WINDOWS
+#if defined(PLATFORM_WINDOWS)
 #include <windows.h>
 #include <Winerror.h>
 #include <shlobj.h>
