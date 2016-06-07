@@ -12,7 +12,7 @@ struct Image
     int width;
     int height;
     int pxComponents;
-    std::vector<char> pixelData;
+    std::vector<unsigned char> pixelData;
     std::string path;
 };
 
