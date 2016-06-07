@@ -23,7 +23,7 @@ include_directories(${SDL2_INCLUDE_DIR})
 find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
 
-include_directories("${PROJECT_SOURCE_DIR}/extern/stb")
+include_directories(SYSTEM "${PROJECT_SOURCE_DIR}/extern/stb")
 
 add_executable(main
 src/main.cpp
