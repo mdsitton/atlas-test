@@ -38,7 +38,9 @@ Image load_image(std::string filename)
     if ( img_buf == nullptr )
         throw "Failed to get image data";
 
-    imgData.pixelData = std::make_unique<unsigned char[]>(imgData.width*imgData.height*4);
+    auto &pxData = imgData.pixelData;
+    pxData.reserve(imgData.width*imgData.height*4);
+
 
     // We have to copy the data out of the returned data from stb.
     // This is being done manually so that we only have to deal with RGBA data later.
@@ -47,13 +49,13 @@ Image load_image(std::string filename)
         for (int y = 0; y < imgData.height; y++) {
             i = 4 * (y * imgData.width + x);
             j = imgData.pxComponents * (y * imgData.width + x);
-            imgData.pixelData[i+0] = img_buf[j+0];
-            imgData.pixelData[i+1] = img_buf[j+1];
-            imgData.pixelData[i+2] = img_buf[j+2];
+            pxData[i+0] = img_buf[j+0];
+            pxData[i+1] = img_buf[j+1];
+            pxData[i+2] = img_buf[j+2];
             if (imgData.pxComponents == 4) {
-                imgData.pixelData[i+3] = img_buf[j+3];
+                pxData[i+3] = img_buf[j+3];
             } else {
-                imgData.pixelData[i+3] = 255U;
+                pxData[i+3] = 255U;
             }
         }
     }
@@ -68,19 +70,21 @@ Image blank_image()
     imgData.width = 8192;
     //height = 16384;
     imgData.height = 8192;
+    imgData.pxComponents = 4;
+    int length = imgData.width*imgData.height*imgData.pxComponents;
 
-    imgData.pixelData = std::make_unique<unsigned char[]>(imgData.width*imgData.height*4);
+    auto &pxData = imgData.pixelData;
+    pxData.reserve(length);
 
-    int length = imgData.width*imgData.height*4;
 
 
     for (int i = 0; i < length; i++) {
-        imgData.pixelData[i] = 255U;
+        pxData[i] = 255U;
     }
     return imgData;
 }
 
-Texture::Texture(const Image &image, GLuint program)
+Texture::Texture(Image image, GLuint program)
 : m_image(image), m_program(program)
 {
     m_texUnitID = _texCount;
@@ -93,7 +97,7 @@ Texture::Texture(const Image &image, GLuint program)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width, m_image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.pixelData.get());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width, m_image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &m_image.pixelData[0]);
 }
 
 void Texture::bind()

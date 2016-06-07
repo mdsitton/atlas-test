@@ -37,8 +37,7 @@ void run()
 
 
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    Image img = blank_image();
-    Texture testTex(std::move(img), renderer.get_shader_program());
+    Texture testTex(blank_image(), renderer.get_shader_program());
 
     while (atlasTest.process_events())
     {
