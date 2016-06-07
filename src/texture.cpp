@@ -27,7 +27,7 @@ Image load_image(std::string filename)
     // to prevent potential issues convert each value seperately
     // one could cast the int* to unsigned int* however this could have large issues there can be
     // platform differances on how this is imeplemented.
-    for (int i = 0; i < mem_buf.size(); i++) {
+    for (size_t i = 0; i < mem_buf.size(); i++) {
         conv_mem[i] = static_cast<unsigned char>(mem_buf[i]);
     }
 
@@ -64,19 +64,16 @@ Image load_image(std::string filename)
 }
 
 // Fake load image to test image loading.
-Image blank_image()
+Image blank_image(int width, int height)
 {
     Image imgData;
-    imgData.width = 8192;
-    //height = 16384;
-    imgData.height = 8192;
+    imgData.width = width;
+    imgData.height = height;
     imgData.pxComponents = 4;
     int length = imgData.width*imgData.height*imgData.pxComponents;
 
     auto &pxData = imgData.pixelData;
     pxData.reserve(length);
-
-
 
     for (int i = 0; i < length; i++) {
         pxData[i] = 255U;
@@ -84,10 +81,13 @@ Image blank_image()
     return imgData;
 }
 
+
+
+// Basic Texture class
+
 Texture::Texture(Image image, GLuint program)
-: m_image(image), m_program(program)
+: m_image(image), m_program(program), m_texUnitID(_texCount)
 {
-    m_texUnitID = _texCount;
     _texCount++;
 
     m_texSampID = glGetUniformLocation(m_program, "textureSampler");
@@ -106,4 +106,83 @@ void Texture::bind()
     glBindTexture(GL_TEXTURE_2D, m_texID);
     glUniform1i(m_texSampID, m_texUnitID);
     std::cout << "Texture bound" << std::endl;
+}
+
+// Texture Atlas class
+TextureGridAtlas::TextureGridAtlas(GLuint program, int texSize, int gridSize)
+:m_program(program), m_size(texSize), m_gridSize(gridSize), m_texUnitID(_texCount)
+{
+    _texCount++;
+
+    m_texSampID = glGetUniformLocation(m_program, "textureSampler");
+
+    glGenTextures(1, &m_texID);
+    glBindTexture(GL_TEXTURE_2D, m_texID);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_size, m_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+}
+
+AtlasTexID TextureGridAtlas::add_texture(Image image)
+{
+    auto id = static_cast<AtlasTexID>(m_textures.size());
+    m_textures.push_back(image);
+    return id;
+}
+
+std::array<Coord, 4> TextureGridAtlas::get_uvcoords(AtlasTexID tex)
+{
+    BoundingBox &points = m_texRect[tex];
+
+    double x1 = points.one.x / m_size;
+    double y1 = points.one.y / m_size;
+    double x2 = points.two.x / m_size;
+    double y2 = points.two.y / m_size;
+
+    return {{{x1,y2}, {x2,y2}, {x1,y1}, {x2,y1}}};
+}
+
+void TextureGridAtlas::generate()
+{
+    m_texRect.resize(m_textures.size());
+
+    int cursorPosX = 0;
+    int cursorPosY = 0;
+
+    int maxCursor = m_size - m_gridSize;
+
+    for(auto i = m_textures.begin(); i != m_textures.end(); ++i)
+    {
+        Image &texture = *i;
+        BoundingBox &rect = m_texRect[std::distance(m_textures.begin(), i)];
+
+        rect.one.x = cursorPosX;
+        rect.one.y = cursorPosY;
+        rect.two.x = cursorPosX + m_gridSize;
+        rect.two.y = cursorPosY + m_gridSize;
+
+        glTexSubImage2D(GL_TEXTURE_2D, 0, cursorPosX, cursorPosY, texture.width, texture.height, GL_RGBA, GL_UNSIGNED_BYTE, &texture.pixelData[0]);
+
+        // once at the max cursor start the next line in the atlas.
+        if (cursorPosX > maxCursor) {
+            cursorPosX = 0;
+            cursorPosY += m_gridSize;
+        } else {
+            cursorPosX += m_gridSize;
+        }
+
+        // break out if we are past the max cursor position
+        if (cursorPosY > maxCursor) {
+            break;
+        }
+    }
+}
+
+void TextureGridAtlas::bind()
+{
+    glActiveTexture(GL_TEXTURE0+m_texUnitID);
+    glBindTexture(GL_TEXTURE_2D, m_texID);
+    glUniform1i(m_texSampID, m_texUnitID);
+    std::cout << "TextureAtlas bound" << std::endl;
 }

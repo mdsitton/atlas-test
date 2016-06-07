@@ -17,7 +17,7 @@ struct Image
 };
 
 Image load_image(std::string filename);
-Image blank_image();
+Image blank_image(int width, int height);
 
 class Texture
 {
@@ -34,8 +34,35 @@ public:
     //~Texture();
 };
 
-class TextureAtlas
+typedef unsigned int AtlasTexID;
+
+struct Coord
+{
+    double x;
+    double y;
+};
+
+struct BoundingBox
+{
+    Coord one; // top left
+    Coord two; // bottom right
+};
+
+class TextureGridAtlas
 {
 private:
-    std::vector<Image> test;
+    std::vector<Image> m_textures;
+    std::vector<BoundingBox> m_texRect;
+    GLuint m_program;
+    int m_size;
+    int m_gridSize;
+    int m_texUnitID;
+    int m_texSampID;
+    GLuint m_texID;
+public:
+    TextureGridAtlas(GLuint program, int texSize=1024, int gridSize=64);
+    AtlasTexID add_texture(Image image);
+    std::array<Coord, 4> get_uvcoords(AtlasTexID tex);
+    void generate();
+    void bind();
 };

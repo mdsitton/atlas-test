@@ -14,6 +14,7 @@ struct Rect
 {
     // texture
     // modelmatrix or x, y, rot, scale
+    // ShaderProgram
 };
 */
 class ObjectManager

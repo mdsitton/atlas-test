@@ -37,7 +37,7 @@ void run()
 
 
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    Texture testTex(blank_image(), renderer.get_shader_program());
+    Texture testTex(blank_image(8192, 8192), renderer.get_shader_program());
 
     while (atlasTest.process_events())
     {
