@@ -1,6 +1,7 @@
 #include <memory>
 #include <iostream>
 #include <stdexcept>
+#include <unordered_map>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -95,7 +96,7 @@ Renderer::Renderer(int width, int height)
     glGenVertexArrays(1, arr);
     m_vao = arr[0];
     glBindVertexArray(m_vao);
-    
+
     // we should check the shader compile status for shaders before we link the program
     m_vertexShader = create_shader("/data/shaders/main.vs", GL_VERTEX_SHADER);
     m_fragmentShader = create_shader("/data/shaders/main.fs", GL_FRAGMENT_SHADER);
