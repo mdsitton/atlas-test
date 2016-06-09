@@ -62,7 +62,7 @@ private:
 public:
     TextureGridAtlas(GLuint program, int texSize=1024, int gridSize=64);
     AtlasTexID add_texture(Image image);
-    std::array<Coord, 4> get_uvcoords(AtlasTexID tex);
+    BoundingBox get_uvcoords(AtlasTexID tex);
     void generate();
     void bind();
 };

@@ -131,7 +131,7 @@ AtlasTexID TextureGridAtlas::add_texture(Image image)
     return id;
 }
 
-std::array<Coord, 4> TextureGridAtlas::get_uvcoords(AtlasTexID tex)
+BoundingBox TextureGridAtlas::get_uvcoords(AtlasTexID tex)
 {
     BoundingBox &points = m_texRect[tex];
 
@@ -140,7 +140,7 @@ std::array<Coord, 4> TextureGridAtlas::get_uvcoords(AtlasTexID tex)
     double x2 = points.two.x / m_size;
     double y2 = points.two.y / m_size;
 
-    return {{{x1,y2}, {x2,y2}, {x1,y1}, {x2,y1}}};
+    return {x1, y1, x2, y2};
 }
 
 void TextureGridAtlas::generate()

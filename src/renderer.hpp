@@ -13,7 +13,7 @@ void check_program(GLuint program);
 struct Rect
 {
     // texture
-    // modelmatrix or x, y, rot, scale
+    // modelmatrix
     // ShaderProgram
 };
 */
@@ -35,6 +35,17 @@ private:
     GLuint m_program;
     GLuint m_vertexShader;
     GLuint m_fragmentShader;
+
+    GLint m_vertLoc;
+    GLint m_texCoordLoc;
+    GLint m_groupingLoc;
+
+    GLuint m_vertBuffer;
+    GLuint m_texCoordBuffer;
+    GLuint m_groupingBuffer;
+
+
+
     int m_width;
     int m_height;
     glm::mat4 m_projection;

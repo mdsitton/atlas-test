@@ -30,6 +30,7 @@ void init_gl3w()
 
 void run()
 {
+
     init_sdl();
     Application atlasTest {800, 600, "Atlas Tests"};
     init_gl3w();
@@ -37,11 +38,15 @@ void run()
 
 
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    Texture testTex(blank_image(8192, 8192), renderer.get_shader_program());
-
+    GLuint program = renderer.get_shader_program();
+    Texture testTex(blank_image(8192, 8192), program);
+    glUseProgram(program);
+    testTex.bind();
     while (atlasTest.process_events())
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        renderer.render();
         atlasTest.swap();
         renderer.error_check();
     }

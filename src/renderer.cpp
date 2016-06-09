@@ -90,26 +90,60 @@ GLuint setup_program(GLuint vertex, GLuint fragment)
 Renderer::Renderer(int width, int height)
 : m_width(width), m_height(height)
 {
+    GLenum err;
+
     m_projection = glm::ortho(0.0f, static_cast<float>(m_width), static_cast<float>(m_height), 0.0f, -1.0f, 1.0f);
     glViewport(0, 0, m_width, m_height);
-    GLuint arr[1];
-    glGenVertexArrays(1, arr);
-    m_vao = arr[0];
-    glBindVertexArray(m_vao);
+    glCreateVertexArrays(1, &m_vao);
+    //glBindVertexArray(m_vao);
 
     // we should check the shader compile status for shaders before we link the program
     m_vertexShader = create_shader("/data/shaders/main.vs", GL_VERTEX_SHADER);
     m_fragmentShader = create_shader("/data/shaders/main.fs", GL_FRAGMENT_SHADER);
 
-    check_shader(m_vertexShader);
-    check_shader(m_fragmentShader);
+    // check_shader(m_vertexShader);
+    // check_shader(m_fragmentShader);
 
     m_program = setup_program(m_vertexShader, m_fragmentShader);
 
-    check_program(m_program);
-
+    //check_program(m_program);
 
     glUseProgram(m_program);
+
+    m_vertLoc = glGetAttribLocation(m_program, "position");
+    m_texCoordLoc = glGetAttribLocation(m_program, "position");
+    m_groupingLoc = glGetAttribLocation(m_program, "group");
+
+    GLuint buffers[3];
+    glCreateBuffers(3, buffers);
+
+    m_vertBuffer = buffers[0];
+    m_texCoordBuffer = buffers[1];
+    m_groupingBuffer = buffers[2];
+
+        err = glGetError();
+        std::cout << err << std::endl;
+    GLuint vertBindingIndex = 0;
+    glEnableVertexArrayAttrib(m_vao, m_vertLoc);
+    glVertexArrayAttribBinding(m_vao, m_vertLoc, vertBindingIndex);
+    glVertexArrayAttribFormat(m_vao, m_vertLoc, 2, GL_FLOAT, GL_TRUE, sizeof(float));
+    glVertexArrayVertexBuffer(m_vao, vertBindingIndex, m_vertBuffer, 0, sizeof(float));
+
+    GLuint texCoordBindingIndex = 1;
+    glEnableVertexArrayAttrib(m_vao, m_texCoordLoc);
+    glVertexArrayAttribBinding(m_vao, m_texCoordLoc, texCoordBindingIndex);
+    glVertexArrayAttribFormat(m_vao, m_texCoordLoc, 2, GL_FLOAT, GL_TRUE, sizeof(float));
+    glVertexArrayVertexBuffer(m_vao, texCoordBindingIndex, m_texCoordBuffer, 0, sizeof(float));
+
+    // having issues here so bye for now
+    // GLuint groupingBindingIndex = 2;
+    // std::cout << m_groupingLoc << std::endl;
+    // glEnableVertexArrayAttrib(m_vao, 2);
+    // glVertexArrayAttribBinding(m_vao, 2, groupingBindingIndex);
+    // glVertexArrayAttribIFormat(m_vao, 2, 1, GL_INT, sizeof(int));
+    // glVertexArrayVertexBuffer(m_vao, groupingBindingIndex, m_groupingBuffer, 0, sizeof(int));
+
+    glBindVertexArray(m_vao);
 }
 
 void Renderer::error_check()
@@ -128,8 +162,16 @@ void Renderer::error_check()
         throw std::runtime_error(errorStr.c_str());
     }
 }
-
+GLuint m_vertLoc;
+GLuint uvCoordAndGroupingLoc;
+//static std::vector<float> points {0.0,0.0, 0.0,1.0, 1.0,0.0, 1.0,1.0}; //x,y, x,y, x,y, x,y
+static std::vector<float> points {0.0,0.0, 0.0,1.0, 1.0,1.0, 0.0,0.0, 1.0,1.0, 1.0,0.0}; //x,y, etc...
+static std::vector<int> pos {1, 1, 1, 1, 1, 1}; //x,y, etc...
+//static std::vector<int> index {0, 1, 3,  0, 3, 2};
 void Renderer::render()
 {
-
+    glNamedBufferData(m_vertBuffer, sizeof(float) * points.size(), &points[0], GL_DYNAMIC_DRAW);
+    glNamedBufferData(m_texCoordBuffer, sizeof(float) * points.size(), &points[0], GL_DYNAMIC_DRAW);
+    //glNamedBufferData(m_groupingBuffer, sizeof(int) * pos.size(), &pos[0], GL_DYNAMIC_DRAW);
+    glDrawArrays(GL_TRIANGLES, 0, 1);
 }
